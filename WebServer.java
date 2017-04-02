@@ -53,7 +53,7 @@ public class WebServer {
 			if(query != null){				
 				try {
 					Runtime rt = Runtime.getRuntime();
-					Process pr = rt.exec("docker run -itd -c " + cpu + " -m " + memory + " -e affinity:requestclass=" + requestClass + " -e affinity:requesttype==" + requestType + " " +  image);
+					Process pr = rt.exec("docker run -itd -c " + cpu + " -m " + memory + " -e affinity:requestclass==" + requestClass + " -e affinity:requesttype==" + requestType + " " +  image);
  
 					String response = "Sucessfully scheduled request";
             		t.sendResponseHeaders(200, response.length());
