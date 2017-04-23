@@ -36,9 +36,9 @@ public class WebServer {
     	{
     		this.t = t;
     		query = t.getRequestURI().getQuery(); //guardamos o que o user introduziu em string
-    		if(query != null) //se a query for null entao e um ping do load balancer
+    		if(query != null) 
 			{
-				String[] parts = query.split("&"); //vamos buscar o numero que o user introduziu que fica guardado em [1]
+				String[] parts = query.split("&"); 
 				cpu = parts[0];		
 				memory = parts[1];
 				image = parts[2];
@@ -53,7 +53,7 @@ public class WebServer {
 			if(query != null){				
 				try {
 					Runtime rt = Runtime.getRuntime();
-					Process pr = rt.exec("docker run -itd -c " + cpu + " -m " + memory + " -e affinity:requestclass==" + requestClass + " -e affinity:requesttype==" + requestType + " " +  image);
+					Process pr = rt.exec("docker -H tcp://0.0.0.0:2376 run -itd -c " + cpu + " -m " + memory + " -e affinity:requestclass==" + requestClass + " -e affinity:requesttype==" + requestType + " " +  image);
  
 					String response = "Sucessfully scheduled request";
             		t.sendResponseHeaders(200, response.length());
