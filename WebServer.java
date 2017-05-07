@@ -57,8 +57,9 @@ public class WebServer {
 //					Process pr = rt.exec("docker -H tcp://0.0.0.0:2376 run -itd -c " + cpu + " -m " + memory + " -e affinity:requestclass==" + requestClass + " -e affinity:requesttype==" + requestType + " " +  image);
 					//TESTING
 					Process pr = rt.exec("docker -H tcp://0.0.0.0:2376 run --rm -c " + cpu + " -m " + memory + " -e affinity:requestclass==" + requestClass + " -e affinity:requesttype==" + requestType + " " +  image);
- 
-					String response = "Sucessfully scheduled request";
+					BufferedReader in = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+					
+					String response = in.readLine();
             		t.sendResponseHeaders(200, response.length());
             		OutputStream os = t.getResponseBody();
             		os.write(response.getBytes());
