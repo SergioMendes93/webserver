@@ -28,7 +28,7 @@ public class WebServer {
 
     static class MyThread extends Thread
     {
-    	private String cpu, memory, image, requestClass, requestType, makespan;
+    	private String cpu, memory, image, requestClass, requestType, makespan, portNumber;
     	HttpExchange t;
     	String query;
 
@@ -45,6 +45,7 @@ public class WebServer {
 				requestClass = parts[3];
 				requestType = parts[4];
 				makespan = parts[5];
+				portNumber = parts[6];
     		}
     	}
     	//codigo corrido quando fazemos start na thread
@@ -58,12 +59,20 @@ public class WebServer {
 //                                      Process pr = rt.exec("docker -H tcp://0.0.0.0:2376 run -itd -c " + cpu + " -m " + memory + " -e affinity:requestclass==" + requestClass + " -e a$
                                         //TESTING
                                 if (requestClass.equals("0")) { //for other scheduling algorithms
-                                        pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + " " +  image);
-                                } else { // for energy algorithm
-                                        pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -c " + cpu + " -m " + memory + " -e affinity:requestclass==" + requestClass + " -e affinity:makespan==" + makespan + " -e affinity:requesttype==" + requestType + " " +  image);
+					if (requestType.equals("service"))
+                                        	pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -p " + portNumber +":"+ portNumber + " -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + " " +  image + " " + portNumber);
+                              		else // a job
+					 pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + " " + image);
+				  } else { // for energy algorithm
+					if (requestType.equals("service"))
+                                        	pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -p " + portNumber +":"+ portNumber + " -c " + cpu + " -m " + memory + " -e affinity:requestclass==" + requestClass + " -e affinity:makespan==" + makespan + " -e affinity:requesttype==" + requestType + " " +  image + " " + portNumber);
+                                        else 
+					 pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -c " + cpu + " -m " + memory + " -e affinity:requestclass==" + requestClass + " -e affinity:makespan==" + makespan + " -e affinity:requesttype==" + requestType + " " +  image);
                                 }
                                 int exitVal = pr.waitFor();
                                 if (exitVal != 0) { //failed allocation
+					System.out.println("Failed");
+
                                         try(FileWriter fw = new FileWriter("energyFailed.txt", true);
                                         BufferedWriter bw = new BufferedWriter(fw);
                                         PrintWriter out = new PrintWriter(bw))
@@ -73,6 +82,8 @@ public class WebServer {
                                                 System.out.println("Exception writing to file " + e);
                                         }
                                 } else { //successful allocation
+					System.out.println("Success");
+
                                         try(FileWriter fw = new FileWriter("energySuccess.txt", true);
                                         BufferedWriter bw = new BufferedWriter(fw);
                                         PrintWriter out = new PrintWriter(bw))
