@@ -28,7 +28,7 @@ public class WebServer {
 
     static class MyThread extends Thread
     {
-    	private String cpu, memory, image, requestClass, requestType;
+    	private String cpu, memory, image, requestClass, requestType, makespan;
     	HttpExchange t;
     	String query;
 
@@ -44,6 +44,7 @@ public class WebServer {
 				image = parts[2];
 				requestClass = parts[3];
 				requestType = parts[4];
+				makespan = parts[5];
     		}
     	}
     	//codigo corrido quando fazemos start na thread
@@ -56,7 +57,7 @@ public class WebServer {
 					
 //					Process pr = rt.exec("docker -H tcp://0.0.0.0:2376 run -itd -c " + cpu + " -m " + memory + " -e affinity:requestclass==" + requestClass + " -e affinity:requesttype==" + requestType + " " +  image);
 					//TESTING
-					Process pr = rt.exec("docker -H tcp://0.0.0.0:2376 run -itd -c " + cpu + " -m " + memory + " -e affinity:requestclass==" + requestClass + " -e affinity:requesttype==" + requestType + " " +  image);
+					Process pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -c " + cpu + " -m " + memory + " -e affinity:requestclass==" + requestClass + " -e affinity:makespan==" + makespan + " -e affinity:requesttype==" + requestType + " " +  image);
 					
 					String response = "Successfully scheduled request";
             		t.sendResponseHeaders(200, response.length());
