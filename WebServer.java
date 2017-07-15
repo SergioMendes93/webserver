@@ -51,24 +51,46 @@ public class WebServer {
     	@Override
     	public void run() 
     	{	
-		if(query != null){				
-			try {
-				Runtime rt = Runtime.getRuntime();
-					
-//					Process pr = rt.exec("docker -H tcp://0.0.0.0:2376 run -itd -c " + cpu + " -m " + memory + " -e affinity:requestclass==" + requestClass + " -e affinity:requesttype==" + requestType + " " +  image);
-					//TESTING
-				Process pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -c " + cpu + " -m " + memory + " -e affinity:requestclass==" + requestClass + " -e affinity:makespan==" + makespan + " -e affinity:requesttype==" + requestType + " " +  image);
-					
-				String response = "Successfully scheduled request";
-            			t.sendResponseHeaders(200, response.length());
-            			OutputStream os = t.getResponseBody();
-            			os.write(response.getBytes());
-            			os.close();
-			} catch(IOException e) {
-				System.out.println("Failed allocation");
-				e.printStackTrace();
-			}
-		}
+		if(query != null){
+                        try {
+                                Runtime rt = Runtime.getRuntime();
+                                Process pr;
+//                                      Process pr = rt.exec("docker -H tcp://0.0.0.0:2376 run -itd -c " + cpu + " -m " + memory + " -e affinity:requestclass==" + requestClass + " -e a$
+                                        //TESTING
+                                if (requestClass.equals("0")) { //for other scheduling algorithms
+                                        pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + " " +  image);
+                                } else { // for energy algorithm
+                                        pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -c " + cpu + " -m " + memory + " -e affinity:requestclass==" + requestClass + " -e affinity:makespan==" + makespan + " -e affinity:requesttype==" + requestType + " " +  image);
+                                }
+                                int exitVal = pr.waitFor();
+                                if (exitVal != 0) { //failed allocation
+                                        try(FileWriter fw = new FileWriter("energyFailed.txt", true);
+                                        BufferedWriter bw = new BufferedWriter(fw);
+                                        PrintWriter out = new PrintWriter(bw))
+                                        {
+                                                out.println("1");
+                                        } catch (IOException e) {
+                                                System.out.println("Exception writing to file " + e);
+                                        }
+                                } else { //successful allocation
+                                        try(FileWriter fw = new FileWriter("energySuccess.txt", true);
+                                        BufferedWriter bw = new BufferedWriter(fw);
+                                        PrintWriter out = new PrintWriter(bw))
+                                        {
+                                                out.println("1");
+                                        } catch (IOException e) {
+                                                System.out.println("Exception writing to file " + e);
+                                        }
+                                }
+                                String response = "Successfully scheduled request";
+                                t.sendResponseHeaders(200, response.length());
+                                OutputStream os = t.getResponseBody();
+                                os.write(response.getBytes());
+                                os.close();
+                        } catch(Exception e) {
+                                e.printStackTrace();
+                        }
+                }
     	}
 	}
 }
