@@ -63,7 +63,7 @@ public class WebServer {
                                 if (requestClass.equals("0")) { //for other scheduling algorithms
 					if (requestType.equals("service")) {
                              			if (image.equals("redis"))
-	                                        	pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -p " + portNumber +":"+ portNumber + " -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + "-e affinity:port==" + portNumber + " " +  image + " --port " + portNumber);
+	                                        	pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -p " + portNumber +":"+ portNumber + " -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + " -e affinity:port==" + portNumber + " " +  image + " --port " + portNumber);
 						else
                                         		pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -p " + portNumber +":"+ portNumber + " -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + "-e affinity:port==" + portNumber + " " +  image + " " + portNumber);
 					}
@@ -78,9 +78,9 @@ public class WebServer {
 				} else { // for energy algorithm
 					if (requestType.equals("service")) {
                              			if (image.equals("redis"))
-	                                        	pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -p " + portNumber +":"+ portNumber + " -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + "-e affinity:port==" + portNumber + " " +  image + " --port " + portNumber);
+	                                        	pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -p " + portNumber + ":" + portNumber + " -c " + cpu + " -m " + memory + " -e affinity:makespan==" + makespan + " -e affinity:port==" + portNumber + " -e affinity:requestclass==" + requestClass + " -e affinity:requesttype==" + requestType + " " +  image + " --port " + portNumber);
 						else
-                                        		pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -p " + portNumber +":"+ portNumber + " -c " + cpu + " -m " + memory + " -e affinity:requestclass==" + requestClass + " -e affinity:makespan==" + makespan + " -e affinity:requesttype==" + requestType + " -e affinity:port==" + portNumber + " " +  image + " " + portNumber);
+                                        		pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -p " + portNumber + ":" + portNumber + " -c " + cpu + " -m " + memory + " -e affinity:requestclass==" + requestClass + " -e affinity:makespan==" + makespan + " -e affinity:requesttype==" + requestType + " -e affinity:port==" + portNumber + " " +  image + " " + portNumber);
  					}
                                        	else {
 						if (image.equals("enhance")) { //mem/cpu intensive job {
