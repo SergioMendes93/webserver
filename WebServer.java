@@ -66,18 +66,26 @@ public class WebServer {
 						else
                                         		pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -p " + portNumber +":"+ portNumber + " -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + "-e affinity:port==" + portNumber + " " +  image + " " + portNumber);
 					}
-					else // a job
-					 pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + " " + image);
-				  } else { // for energy algorithm
+					else { // a job
+						if ( image.equals("enhance")) //mem/cpu intensive job
+							pr = rt.exec("docker -H tcp://10.5.60.2:2377 run --rm -v /home/smendes:/ne/input -itd -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + " alexjc/neural-enhance --zoom=2 input/macos.jpg");
+						else //cpu intensive job
+							pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + " " + image);
+					}
+				} else { // for energy algorithm
 					if (requestType.equals("service")) {
                              			if (image.equals("redis"))
 	                                        	pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -p " + portNumber +":"+ portNumber + " -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + "-e affinity:port==" + portNumber + " " +  image + " --port " + portNumber);
 						else
                                         		pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -p " + portNumber +":"+ portNumber + " -c " + cpu + " -m " + memory + " -e affinity:requestclass==" + requestClass + " -e affinity:makespan==" + makespan + " -e affinity:requesttype==" + requestType + " -e affinity:port==" + portNumber + " " +  image + " " + portNumber);
  					}
-                                       else 
-					 pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -c " + cpu + " -m " + memory + " -e affinity:requestclass==" + requestClass + " -e affinity:makespan==" + makespan + " -e affinity:requesttype==" + requestType + " " +  image);
-                                }
+                                       	else {
+						if ( image.equals("enhance")) //mem/cpu intensive job
+							pr = rt.exec("docker -H tcp://10.5.60.2:2377 run --rm -v /home/smendes:/ne/input -itd -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + " alexjc/neural-enhance --zoom=2 input/macos.jpg");
+						else
+						 	pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -c " + cpu + " -m " + memory + " -e affinity:requestclass==" + requestClass + " -e affinity:makespan==" + makespan + " -e affinity:requesttype==" + requestType + " " +  image);
+                        		}
+			        }
                                 int exitVal = pr.waitFor();
                                 if (exitVal != 0) { //failed allocation
 					System.out.println("Failed");
