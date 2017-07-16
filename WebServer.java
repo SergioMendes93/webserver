@@ -31,6 +31,7 @@ public class WebServer {
     	private String cpu, memory, image, requestClass, requestType, makespan, portNumber;
     	HttpExchange t;
     	String query;
+	int i = 0;
 
     	public MyThread(HttpExchange t)
     	{
@@ -69,8 +70,10 @@ public class WebServer {
 					else { // a job
 						if ( image.equals("enhance")) //mem/cpu intensive job
 							pr = rt.exec("docker -H tcp://10.5.60.2:2377 run --rm -v /home/smendes:/ne/input -itd -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + " alexjc/neural-enhance --zoom=2 input/macos.jpg");
-						else //cpu intensive job
-							pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + " " + image);
+						else {//cpu intensive job {
+							pr = rt.exec("docker -H tcp://10.5.60.2:2377 run --rm -v /home/smendes:/tmp/workdir -w=/tmp/workdir -itd -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + " " + " jrottenberg/ffmpeg -i dead.avi -r 100 -b 700k -qscale 0 -ab 160k -ar 44100 result"+i+".dvd -y ");
+							i++;
+						}
 					}
 				} else { // for energy algorithm
 					if (requestType.equals("service")) {
@@ -83,9 +86,11 @@ public class WebServer {
 						if (image.equals("enhance")) { //mem/cpu intensive job {
 							pr = rt.exec("docker -H tcp://10.5.60.2:2377 run --rm -v /home/smendes:/ne/input -itd -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + " -e affinity:requestclass==" + requestClass + " -e affinity:requesttype==" + requestType + " alexjc/neural-enhance --zoom=2 input/macos.jpg");
 						}
-						else
-						 	pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -c " + cpu + " -m " + memory + " -e affinity:requestclass==" + requestClass + " -e affinity:makespan==" + makespan + " -e affinity:requesttype==" + requestType + " " +  image);
-                        		}
+						else {			 
+							pr = rt.exec("docker -H tcp://10.5.60.2:2377 run --rm -v /home/smendes:/tmp/workdir -w=/tmp/workdir -itd -c " + cpu + " -m " + memory + " -e affinity:requestclass==" + requestClass + " -e affinity:makespan==" + makespan + " -e affinity:requesttype==" + requestType + " jrottenberg/ffmpeg -i dead.avi -r 100 -b 700k -qscale 0 -ab 160k -ar 44100 result"+i+".dvd -y");
+                        				i++;
+						}
+					}
 			        }
                                 int exitVal = pr.waitFor();
                                 if (exitVal != 0) { //failed allocation
