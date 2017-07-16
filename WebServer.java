@@ -80,8 +80,9 @@ public class WebServer {
                                         		pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -p " + portNumber +":"+ portNumber + " -c " + cpu + " -m " + memory + " -e affinity:requestclass==" + requestClass + " -e affinity:makespan==" + makespan + " -e affinity:requesttype==" + requestType + " -e affinity:port==" + portNumber + " " +  image + " " + portNumber);
  					}
                                        	else {
-						if ( image.equals("enhance")) //mem/cpu intensive job
+						if (image.equals("enhance")) { //mem/cpu intensive job {
 							pr = rt.exec("docker -H tcp://10.5.60.2:2377 run --rm -v /home/smendes:/ne/input -itd -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + " -e affinity:requestclass==" + requestClass + " -e affinity:requesttype==" + requestType + " alexjc/neural-enhance --zoom=2 input/macos.jpg");
+						}
 						else
 						 	pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -c " + cpu + " -m " + memory + " -e affinity:requestclass==" + requestClass + " -e affinity:makespan==" + makespan + " -e affinity:requesttype==" + requestType + " " +  image);
                         		}
