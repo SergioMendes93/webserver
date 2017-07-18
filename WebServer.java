@@ -69,9 +69,9 @@ public class WebServer {
 					}
 					else { // a job
 						if ( image.equals("enhance")) //mem/cpu intensive job
-							pr = rt.exec("docker -H tcp://10.5.60.2:2377 run --rm -v /home/smendes:/ne/input -itd -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + " alexjc/neural-enhance --zoom=2 input/macos.jpg");
+							pr = rt.exec("docker -H tcp://10.5.60.2:2377 run  -v /home/smendes:/ne/input -itd -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + " alexjc/neural-enhance --zoom=2 input/macos.jpg");
 						else {//cpu intensive job {
-							pr = rt.exec("docker -H tcp://10.5.60.2:2377 run --rm -v /home/smendes:/tmp/workdir -w=/tmp/workdir -itd -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + " " + " jrottenberg/ffmpeg -i dead.avi -r 100 -b 700k -qscale 0 -ab 160k -ar 44100 result"+i+".dvd -y ");
+							pr = rt.exec("docker -H tcp://10.5.60.2:2377 run  -v /home/smendes:/tmp/workdir -w=/tmp/workdir -itd -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + " " + " jrottenberg/ffmpeg -i dead.avi -r 100 -b 700k -qscale 0 -ab 160k -ar 44100 result"+i+".dvd -y ");
 							i++;
 						}
 					}
@@ -84,17 +84,23 @@ public class WebServer {
  					}
                                        	else {
 						if (image.equals("enhance")) { //mem/cpu intensive job {
-							pr = rt.exec("docker -H tcp://10.5.60.2:2377 run --rm -v /home/smendes:/ne/input -itd -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + " -e affinity:requestclass==" + requestClass + " -e affinity:requesttype==" + requestType + " alexjc/neural-enhance --zoom=2 input/macos.jpg");
+							pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -v /home/smendes:/ne/input -itd -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + " -e affinity:requestclass==" + requestClass + " -e affinity:requesttype==" + requestType + " alexjc/neural-enhance --zoom=2 input/macos.jpg");
 						}
 						else {			 
-							pr = rt.exec("docker -H tcp://10.5.60.2:2377 run --rm -v /home/smendes:/tmp/workdir -w=/tmp/workdir -itd -c " + cpu + " -m " + memory + " -e affinity:requestclass==" + requestClass + " -e affinity:makespan==" + makespan + " -e affinity:requesttype==" + requestType + " jrottenberg/ffmpeg -i dead.avi -r 100 -b 700k -qscale 0 -ab 160k -ar 44100 result"+i+".dvd -y");
+							pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -v /home/smendes:/tmp/workdir -w=/tmp/workdir -itd -c " + cpu + " -m " + memory + " -e affinity:requestclass==" + requestClass + " -e affinity:makespan==" + makespan + " -e affinity:requesttype==" + requestType + " jrottenberg/ffmpeg -i dead.avi -r 100 -b 700k -qscale 0 -ab 160k -ar 44100 result"+i+".dvd -y");
                         				i++;
 						}
 					}
 			        }
+				BufferedReader b = new BufferedReader(new InputStreamReader(pr.getErrorStream()));
+                                String line;
+                                if ((line = b.readLine()) != null)
+                                        System.out.println(line);
+
                                 int exitVal = pr.waitFor();
+
                                 if (exitVal != 0) { //failed allocation
-					System.out.println("Failed");
+					System.out.println("Failed " + image);
 
                                         try(FileWriter fw = new FileWriter("energyFailed.txt", true);
                                         BufferedWriter bw = new BufferedWriter(fw);
@@ -105,7 +111,7 @@ public class WebServer {
                                                 System.out.println("Exception writing to file " + e);
                                         }
                                 } else { //successful allocation
-					System.out.println("Success");
+					System.out.println("Success " + image);
 
                                         try(FileWriter fw = new FileWriter("energySuccess.txt", true);
                                         BufferedWriter bw = new BufferedWriter(fw);
