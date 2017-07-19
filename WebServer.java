@@ -92,15 +92,16 @@ public class WebServer {
 						}
 					}
 			        }
-				BufferedReader b = new BufferedReader(new InputStreamReader(pr.getErrorStream()));
-                                String line;
-                                if ((line = b.readLine()) != null)
-                                        System.out.println(line);
-
                                 int exitVal = pr.waitFor();
 
                                 if (exitVal != 0) { //failed allocation
-					System.out.println("Failed " + image);
+					System.out.println("Failed " + image + " error code: " + exitVal);
+
+					BufferedReader b = new BufferedReader(new InputStreamReader(pr.getErrorStream()));
+                                	String line;
+                                	if ((line = b.readLine()) != null)
+                                        	System.out.println(line);
+
 
                                         try(FileWriter fw = new FileWriter("energyFailed.txt", true);
                                         BufferedWriter bw = new BufferedWriter(fw);
