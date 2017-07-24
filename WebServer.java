@@ -64,8 +64,9 @@ public class WebServer {
 					if (requestType.equals("service")) {
                              			if (image.equals("redis"))
 	                                        	pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -p " + portNumber +":"+ portNumber + " -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + " -e affinity:port==" + portNumber + " " +  image + " --port " + portNumber);
-						else
-                                        		pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -p " + portNumber +":"+ portNumber + " -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + "-e affinity:port==" + portNumber + " " +  image + " " + portNumber);
+						else {
+							pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -p " + portNumber +":"+ portNumber + " -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + " -e affinity:port==" + portNumber + " " +  image + " " + portNumber);
+						}
 					}
 					else { // a job
 						if ( image.equals("enhance")) //mem/cpu intensive job
