@@ -245,6 +245,7 @@ func main() {
 		if timeNow >= 30 {
 			break
 		}
+		fmt.Println("AQUI")
 		line := scanner.Text()
 		parts := strings.Split(line, ",")
                 makespan := strings.Split(parts[0],":")
