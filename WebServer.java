@@ -59,7 +59,7 @@ public class WebServer {
     	{	
 		if(query != null){
                         try {
-				if ( requestClass == "5" ) { //this means it has finished
+				if ( requestClass.equals("5") ) { //this means it has finished
 					long average = 0;
 					for (Long time: schedulingTimes) {
 						average += time.longValue();
@@ -80,62 +80,87 @@ public class WebServer {
                                 Runtime rt = Runtime.getRuntime();
                                 Process pr;
 				long startTime = 0;
+				long timeNow = 0;
 //                                      Process pr = rt.exec("docker -H tcp://0.0.0.0:2376 run -itd -c " + cpu + " -m " + memory + " -e affinity:requestclass==" + requestClass + " -e a$
                                         //TESTING
                                 if (requestClass.equals("0")) { //for other scheduling algorithms
 					if (requestType.equals("service")) {
                              			if (image.equals("redis")) {
-							pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -p " + portNumber +":"+ portNumber + " -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + " -e affinity:port==" + portNumber + " " +  image + " --port " + portNumber);
 	                                        	startTime = System.nanoTime();
+							pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -p " + portNumber +":"+ portNumber + " -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + " -e affinity:port==" + portNumber + " " +  image + " --port " + portNumber);
+							timeNow = System.nanoTime() - startTime;
+							schedulingTimes.add(timeNow);
+							System.out.println("Collecting time " + timeNow);
 						}
 						else {
-							pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -p " + portNumber +":"+ portNumber + " -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + " -e affinity:port==" + portNumber + " " +  image + " " + portNumber);
 		                                     	startTime = System.nanoTime();
+							pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -p " + portNumber +":"+ portNumber + " -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + " -e affinity:port==" + portNumber + " " +  image + " " + portNumber);
+							timeNow = System.nanoTime() - startTime;
+							schedulingTimes.add(timeNow);
+							System.out.println("Collecting time " + timeNow);
 						}
 					}
 					else { // a job
 						if ( image.equals("enhance")) { //mem/cpu intensive job
+		                                     	startTime = System.nanoTime();
 							pr = rt.exec("docker -H tcp://10.5.60.2:2377 run  -v /home/smendes:/ne/input -itd -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + " alexjc/neural-enhance --zoom=2 input/macos.jpg");
-		                                        startTime = System.nanoTime();
+							timeNow = System.nanoTime() - startTime;
+							schedulingTimes.add(timeNow);
+							System.out.println("Collecting time " + timeNow);
 						}else {//cpu intensive job {
+		                                        startTime = System.nanoTime();
 							pr = rt.exec("docker -H tcp://10.5.60.2:2377 run  -v /home/smendes:/tmp/workdir -w=/tmp/workdir -itd -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + " " + " jrottenberg/ffmpeg -i dead.avi -r 100 -b 700k -qscale 0 -ab 160k -ar 44100 result"+i+".dvd -y ");
+							timeNow = System.nanoTime() - startTime;
+							schedulingTimes.add(timeNow);
+							System.out.println("Collecting time " + timeNow);
 							i++;
-				                      	startTime = System.nanoTime();
 						}
 					}
 				} else { // for energy algorithm
 					if (requestType.equals("service")) {
                              			if (image.equals("redis")) {
+				                      	startTime = System.nanoTime();
 	                                        	pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -p " + portNumber + ":" + portNumber + " -c " + cpu + " -m " + memory + " -e affinity:makespan==" + makespan + " -e affinity:port==" + portNumber + " -e affinity:requestclass==" + requestClass + " -e affinity:requesttype==" + requestType + " " +  image + " --port " + portNumber);
-					            	startTime = System.nanoTime();
+							timeNow = System.nanoTime() - startTime;
+							schedulingTimes.add(timeNow);
+							System.out.println("Collecting time " + timeNow);
 						}
 						else {
+					            	startTime = System.nanoTime();
                                         		pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -itd -p " + portNumber + ":" + portNumber + " -c " + cpu + " -m " + memory + " -e affinity:requestclass==" + requestClass + " -e affinity:makespan==" + makespan + " -e affinity:requesttype==" + requestType + " -e affinity:port==" + portNumber + " " +  image + " " + portNumber);
- 			                          	startTime = System.nanoTime();
+							timeNow = System.nanoTime() - startTime;
+							schedulingTimes.add(timeNow);
+							System.out.println("Collecting time " + timeNow);
 						}
 					}
                                        	else {
 						if (image.equals("enhance")) { //mem/cpu intensive job {
+ 			                          	startTime = System.nanoTime();
 							pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -v /home/smendes:/ne/input -itd -c " + cpu + " -m " + memory +" -e affinity:makespan==" + makespan + " -e affinity:requestclass==" + requestClass + " -e affinity:requesttype==" + requestType + " alexjc/neural-enhance --zoom=2 input/macos.jpg");
-	                                        	startTime = System.nanoTime();
+							timeNow = System.nanoTime() - startTime;
+							schedulingTimes.add(timeNow);
+							System.out.println("Collecting time " + timeNow);
 						}
 						else {			 
-							pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -v /home/smendes:/tmp/workdir -w=/tmp/workdir -itd -c " + cpu + " -m " + memory + " -e affinity:requestclass==" + requestClass + " -e affinity:makespan==" + makespan + " -e affinity:requesttype==" + requestType + " jrottenberg/ffmpeg -i dead.avi -r 100 -b 700k -qscale 0 -ab 160k -ar 44100 result"+i+".dvd -y");
-                        				i++;
 	                                        	startTime = System.nanoTime();
+							pr = rt.exec("docker -H tcp://10.5.60.2:2377 run -v /home/smendes:/tmp/workdir -w=/tmp/workdir -itd -c " + cpu + " -m " + memory + " -e affinity:requestclass==" + requestClass + " -e affinity:makespan==" + makespan + " -e affinity:requesttype==" + requestType + " jrottenberg/ffmpeg -i dead.avi -r 100 -b 700k -qscale 0 -ab 160k -ar 44100 result"+i+".dvd -y");
+							timeNow = System.nanoTime() - startTime;
+							schedulingTimes.add(timeNow);
+							System.out.println("Collecting time " + timeNow);
+                        				i++;
 						}
 					}
 			        }
                                 int exitVal = pr.waitFor();
 
                                 if (exitVal != 0) { //failed allocation
-					System.out.println("Failed " + image + " error code: " + exitVal);
+					//System.out.println("Failed " + image + " error code: " + exitVal);
 
 					BufferedReader b = new BufferedReader(new InputStreamReader(pr.getErrorStream()));
-                                	String line;
+                                	/*String line;
                                 	if ((line = b.readLine()) != null)
                                         	System.out.println(line);
-
+*/
 
                                         try(FileWriter fw = new FileWriter("energyFailed.txt", true);
                                         BufferedWriter bw = new BufferedWriter(fw);
@@ -146,10 +171,7 @@ public class WebServer {
                                                 System.out.println("Exception writing to file " + e);
                                         }
                                 } else { //successful allocation
-					long timeNow = System.nanoTime() - startTime;
-					schedulingTimes.add(timeNow);
-
-					System.out.println("Success " + image);
+					//System.out.println("Success " + image);
 
                                         try(FileWriter fw = new FileWriter("energySuccess.txt", true);
                                         BufferedWriter bw = new BufferedWriter(fw);
