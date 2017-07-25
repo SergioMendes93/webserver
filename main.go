@@ -242,7 +242,7 @@ func main() {
 		fmt.Print("Current time: ")
 		fmt.Println(timeNow2)		
 
-		if timeNow >= 30 {
+		if timeNow2 >= 30 {
 			break
 		}
 		fmt.Println("AQUI")
