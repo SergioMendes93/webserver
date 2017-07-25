@@ -174,6 +174,7 @@ func session(requests int64, concurrency int64, completeCh chan time.Duration, l
 	for i = 0; i < concurrency; i++ {
 		wg.Add(1)
 		go func() {
+			time.Sleep(time.Millisecond * 500)
 			worker(n, completeCh, listRequests)
 			wg.Done()
 		}()
@@ -239,13 +240,10 @@ func main() {
 	for scanner.Scan() {
 		timeNow := time.Since(startTime)
 		timeNow2 := timeNow.Minutes()
-		fmt.Print("Current time: ")
-		fmt.Println(timeNow2)		
 
 		if timeNow2 >= 30 {
 			break
 		}
-		fmt.Println("AQUI")
 		line := scanner.Text()
 		parts := strings.Split(line, ",")
                 makespan := strings.Split(parts[0],":")
